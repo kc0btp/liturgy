@@ -1,4 +1,7 @@
 {
+  "editor.default_syntax" : "python",
+  "python.interpreter" : "\/opt\/homebrew\/bin\/python3",
+  "python.pythonPath" : "\/opt\/homebrew\/bin\/python3",
   "workspace.color" : 11,
-  "workspace.name" : "holidays"
+  "workspace.name" : "liturgy"
 }
