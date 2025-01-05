@@ -1,11 +1,36 @@
+# liturgy.py
+# The goal is to make this script print two things:
+# 1. The current liturgical season
+# 2. The current feast day, if it is a feast day
+
 import datetime
 
 currentDate = datetime.datetime.now()
 currentYear = int(currentDate.strftime("%Y"))
 
+# TODO: Complete static date table
+
+feastDict  = {
+	"ChristmasEve": datetime.date(currentYear, 12, 24),
+	"Christmas": datetime.date(currentYear, 12, 25)
+}
+
+def getAdventDates():
+
+	Christmas = feastDict["Christmas"]
+	idx = (Christmas.weekday() + 1) % 7
+	firstSunday = Christmas - datetime.timedelta(days = idx, weeks = 3)
+	secondSunday = Christmas - datetime.timedelta(days = idx, weeks = 2)
+	thirdSunday = Christmas - datetime.timedelta(days = idx, weeks = 1)
+	fourthSunday = Christmas - datetime.timedelta(days = idx)
+
+	advent = (firstSunday, secondSunday, thirdSunday, fourthSunday)
+
+	return advent
+
 def getEasterDate():
 
-	# A table to find easter day taken from the 1662 Book of Common Prayer
+	# A table of golden numbers to find Easter Day taken from the 1662 Book of Common Prayer
 	easterDict = {
 		1: datetime.date(currentYear, 4, 14),
 		2: datetime.date(currentYear, 4, 3),
@@ -35,7 +60,8 @@ def getEasterDate():
 
 # TODO: Determine movable feasts based on easterDate
 
-# TODO: Add static date table
+advent = getAdventDates()
+print (advent[0])
 
 if(datetime.date.today() == getEasterDate()):
 	print("It's Easter")
