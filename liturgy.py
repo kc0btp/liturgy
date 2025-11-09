@@ -104,6 +104,9 @@ def getEasterDate():
 		}
 	)
 
+
+# NOTE: This entire main() function is currently for development only
+# TODO: Replace this with something that only outputs info relevant to today by default
 def main():
 	christmas = findFeast(feastDict, "Christmas Day")
 	epiphany = findFeast(feastDict, "The Epiphany")
@@ -134,4 +137,5 @@ if __name__ == "__main__":
 # TODO: Calculate Pentecost
 # TODO: Calculate Trinity Sunday
 # TODO: Determine Ordinary Time
+# TODO: Allow arguments to find select or all feast dates for a given year
 # REFACTOR: Figure out a way to determine current holiday based on today's date
