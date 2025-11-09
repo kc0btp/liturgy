@@ -5,30 +5,56 @@
 
 import datetime
 
-currentDate = datetime.datetime.now()
+# currentDate = datetime.datetime.now()
+currentDate = datetime.datetime(2027, 1, 1)
 currentYear = int(currentDate.strftime("%Y"))
 
-# TODO: Complete static date table
+# https://www.iccec.org/prayerandreadings/Seasons/index.php
+# Determine the season. The basic Rules:
+# If today is between the first day of Advent (inclusive) and Christmas, it's Advent
+# If today is between Christmas (inclusive) and Epiphany (exclusive), it's Christmas
+# If today is between Epiphany (inclusive) and Ash Wednesday (exclusive), it's Epiphany
+# If today is between Ash Wednesday (inclusive) and Palm Sunday (exclusive), it's Lent
+# If today is between Palm Sunday (inclusive) and Easter (exclusive), it's Holy Week
+# If today is between Easter (inclusive) and Pentecost (exclusive), it's Easter
+# If today is between Pentecost (inclusive) and Trinity Sunday (exclusive), it's Pentecost
+# If today is between Trinity Sunday (inclusive) and the first day of Advent, it's Ordinary Time
 
+# Set feast dates
 feastDict  = {
-	"ChristmasEve": datetime.date(currentYear, 12, 24),
-	"Christmas": datetime.date(currentYear, 12, 25)
+	datetime.date(currentYear, 12, 24): "Christmas Eve",
+	datetime.date(currentYear, 12, 25): "Christmas Day",
+	datetime.date(currentYear, 1, 6): "The Epiphany"
 }
 
+# Find a feast date (key) in a dictionary by name (value)
+def findFeast(dict, searchName):
+	for date, name in dict.items():
+		if name == searchName:
+			return date
+
 def getAdventDates():
+	christmas = findFeast(feastDict, "Christmas Day")
+	idx = (christmas.weekday() + 1) % 7
 
-	Christmas = feastDict["Christmas"]
-	idx = (Christmas.weekday() + 1) % 7
-	firstSunday = Christmas - datetime.timedelta(days = idx, weeks = 3)
-	secondSunday = Christmas - datetime.timedelta(days = idx, weeks = 2)
-	thirdSunday = Christmas - datetime.timedelta(days = idx, weeks = 1)
-	fourthSunday = Christmas - datetime.timedelta(days = idx)
+	firstSunday = christmas - datetime.timedelta(days = idx, weeks = 3)
+	secondSunday = christmas - datetime.timedelta(days = idx, weeks = 2)
+	thirdSunday = christmas - datetime.timedelta(days = idx, weeks = 1)
+	fourthSunday = christmas - datetime.timedelta(days = idx)
 
-	advent = (firstSunday, secondSunday, thirdSunday, fourthSunday)
+	advent = {
+		firstSunday: "First Sunday of Advent",
+		secondSunday: "Second Sunday of Advent",
+		thirdSunday: "Third Sunday of Advent",
+		fourthSunday: "Fourth Sunday of Advent"
+	}
 
 	return advent
 
 def getEasterDate():
+
+	# As calculated in the 1662 Book of Common Prayer
+	goldenNumber = (currentYear + 1) % 19
 
 	# A table of golden numbers to find Easter Day taken from the 1662 Book of Common Prayer
 	easterDict = {
@@ -53,17 +79,32 @@ def getEasterDate():
 		19: datetime.date(currentYear, 3, 27)
 	}
 
-	goldenNumber = (currentYear + 1) % 19
-	easterDate = easterDict[goldenNumber]
+	# The date of the Paschal full moon for the year
+	paschal = easterDict[goldenNumber]
+
+	# If the Paschal moon falls on a Sunday, Easter is the following Sunday
+	if(paschal.weekday() + 1 == 7):
+		easterDate = paschal + datetime.timedelta(days = 7)
+	else:
+		timeDelta = 7 - (paschal.weekday() + 1)
+		easterDate = paschal + datetime.timedelta(days = timeDelta)
 
 	return easterDate
 
+christmas = findFeast(feastDict, "Christmas Day")
+epiphany = findFeast(feastDict, "The Epiphany")
+easter = getEasterDate()
+
+print(christmas)
+print(easter)
+
+
 # TODO: Determine movable feasts based on easterDate
 
-advent = getAdventDates()
-print (advent[0])
+# advent = getAdventDates()
 
-if(datetime.date.today() == getEasterDate()):
-	print("It's Easter")
-else:
-	print("It's not Easter")
+# print(list(advent)[0]) # Prints the value based on the index from the advent dictionary
+
+# This will get the date of the feast based on the value name
+# first = findFeast(advent, "First Sunday of Advent")
+# print(first)
