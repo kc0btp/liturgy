@@ -5,6 +5,7 @@
 
 import argparse
 import datetime
+from datetime import timedelta
 
 # Constants
 DAYS_IN_WEEK = 7
@@ -114,6 +115,16 @@ def getEasterDate():
 		}
 	)
 
+def getAshWednesday():
+	easterDate = findFeast(feastDict, "Easter")
+	ashWednesdayDate = easterDate + timedelta(days=-46) # Ash Wednesday is always 46 days before Easter
+
+	feastDict.update(
+		{
+			ashWednesdayDate: "Ash Wednesday"
+		}
+	)
+
 # NOTE: This entire main() function is currently for development only
 # TODO: Replace this with something that only outputs info relevant to today by default
 def main():
@@ -129,8 +140,12 @@ def main():
 	thirdSundayofAdvent = findFeast(feastDict, "Third Sunday of Advent")
 	fourthSundayofAdvent = findFeast(feastDict, "Fourth Sunday of Advent")
 
+	getAshWednesday()
+	ashWednesday = findFeast(feastDict, "Ash Wednesday")
+
 	# Print out all the values for now:
-	# print("Easter: " + str(easter))
+	print("Ash Wednesday: " + str(ashWednesday))
+	print("Easter: " + str(easter))
 	print("First Sunday of Advent: " + str(firstSundayofAdvent))
 	print("Second Sunday of Advent: " + str(secondSundayofAdvent))
 	print("Third Sunday of Advent: " + str(thirdSundayofAdvent))
@@ -141,12 +156,10 @@ def main():
 if __name__ == "__main__":
 	main()
 
-# TODO: Calculate Ash Wednesday
 # TODO: Calculate Palm Sunday
 # TODO: Calculate Pentecost
 # TODO: Calculate Trinity Sunday
 # TODO: Determine Ordinary Time
-# TODO: Allow arguments to find select or all feast dates for a given year
 # TODO: Create a "print" function that handles the logic of formatting and adjusting date based on whether this year's feast has already passed.
 # REFACTOR: Figure out a way to determine current holiday season based on today's date
 # REFACTOR: findFeast should be able to get current year feast but also next occurrence of a feast even if it's in the next year. Maybe findFeast can remain a pure function to find the feasts within a given year, but then I make a separate function that I can use to determine whether the feast date has already occurred and adjust the year accordingly.
