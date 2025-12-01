@@ -122,6 +122,10 @@ def getPalmSunday(easterDate):
 	palmSundayDate = easterDate + timedelta(weeks=-1)
 	feastDict.update({palmSundayDate: "Palm Sunday"})
 
+def getPentecost(easterDate):
+	pentecostDate = easterDate + timedelta(days=50)
+	feastDict.update({pentecostDate: "Pentecost"})
+
 # NOTE: This entire main() function is currently for development only
 # TODO: Replace this with something that only outputs info relevant to today by default
 def main():
@@ -130,6 +134,7 @@ def main():
 
 	getAshWednesday(easterDate)
 	getPalmSunday(easterDate)
+	getPentecost(easterDate)
 	getAdventDates()
 
 	# Print out all the values for now:
@@ -139,7 +144,6 @@ def main():
 if __name__ == "__main__":
 	main()
 
-# TODO: Calculate Pentecost
 # TODO: Calculate Trinity Sunday
 # TODO: Determine Ordinary Time
 # TODO: Create a "print" function that handles the logic of formatting and adjusting date based on whether this year's feast has already passed.
