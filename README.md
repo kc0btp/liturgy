@@ -1,6 +1,6 @@
 # About
 
-Liturgy is a simple python script that will calculate all of the holy days of the liturgical calendar. The goal of this project is to display the current liturgical period or holiday for the current date in dmenu, but it can be used as a stand-alone script as well.
+Liturgy is a simple python script that will calculate all of the holy days of the liturgical calendar. The goal of this project is to display the current liturgical period or holiday for the current date in [dmenu](https://tools.suckless.org/dmenu/), but it can be used as a stand-alone script as well. The primary source for my calculation has been the 1662 Anglican Book of Common Prayer, though I am not Anglican and the audience for this is not any specific denomination.
 
 # Use
 
