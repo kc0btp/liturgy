@@ -109,68 +109,36 @@ def getEasterDate():
 		timeDelta = DAYS_IN_WEEK - (paschal.weekday() + 1)
 		easterDate = paschal + datetime.timedelta(days = timeDelta)
 
-	feastDict.update(
-		{
-			easterDate: "Easter",
-		}
-	)
+	feastDict.update({easterDate: "Easter"})
+	return easterDate
 
-def getAshWednesday():
-	easterDate = findFeast(feastDict, "Easter")
-	ashWednesdayDate = easterDate + timedelta(days=-46) # Ash Wednesday is always 46 days before Easter
+# Ash Wednesday is always 46 days before Easter
+def getAshWednesday(easterDate):
+	ashWednesdayDate = easterDate + timedelta(days=-46)
+	feastDict.update({ashWednesdayDate: "Ash Wednesday"})
 
-	feastDict.update(
-		{
-			ashWednesdayDate: "Ash Wednesday"
-		}
-	)
-
-def getPalmSunday():
-	easterDate = findFeast(feastDict, "Easter")
-	palmSundayDate = easterDate + timedelta(weeks=-1) # Palm Sunday is the Sunday before Easter
-
-	feastDict.update(
-		{
-			palmSundayDate: "Palm Sunday"
-		}
-	)
+# Palm Sunday is the Sunday before Easter
+def getPalmSunday(easterDate):
+	palmSundayDate = easterDate + timedelta(weeks=-1)
+	feastDict.update({palmSundayDate: "Palm Sunday"})
 
 # NOTE: This entire main() function is currently for development only
 # TODO: Replace this with something that only outputs info relevant to today by default
 def main():
-	christmas = findFeast(feastDict, "Christmas Day")
-	epiphany = findFeast(feastDict, "The Epiphany")
 
-	getEasterDate()
-	easter = findFeast(feastDict, "Easter")
+	easterDate = getEasterDate()
 
-	getAshWednesday()
-	ashWednesday = findFeast(feastDict, "Ash Wednesday")
-
-	getPalmSunday()
-	palmSunday = findFeast(feastDict, "Palm Sunday")
-
+	getAshWednesday(easterDate)
+	getPalmSunday(easterDate)
 	getAdventDates()
-	firstSundayofAdvent = findFeast(feastDict, "First Sunday of Advent")
-	secondSundayofAdvent = findFeast(feastDict, "Second Sunday of Advent")
-	thirdSundayofAdvent = findFeast(feastDict, "Third Sunday of Advent")
-	fourthSundayofAdvent = findFeast(feastDict, "Fourth Sunday of Advent")
 
 	# Print out all the values for now:
-	print("Ash Wednesday: " + str(ashWednesday))
-	print("Palm Sunday: " + str(palmSunday))
-	print("Easter: " + str(easter))
-	print("First Sunday of Advent: " + str(firstSundayofAdvent))
-	print("Second Sunday of Advent: " + str(secondSundayofAdvent))
-	print("Third Sunday of Advent: " + str(thirdSundayofAdvent))
-	print("Fourth Sunday of Advent: " + str(fourthSundayofAdvent))
-	print("Christmas: " + str(christmas))
-	print("Epiphany: " + str(epiphany))
+	for(date, name) in sorted(feastDict.items()):
+		print(f"{name}: {date}")
 
 if __name__ == "__main__":
 	main()
 
-# TODO: Calculate Palm Sunday
 # TODO: Calculate Pentecost
 # TODO: Calculate Trinity Sunday
 # TODO: Determine Ordinary Time
