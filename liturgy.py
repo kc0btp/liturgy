@@ -11,6 +11,7 @@ from datetime import timedelta
 DAYS_IN_WEEK = 7
 feastDict = {}
 
+# TODO: Add a new argument to look up a specific feast; can be combined with --year
 parser = argparse.ArgumentParser(description='Liturgy')
 parser.add_argument('-y', '--year', type=int, nargs='?', help='Display all the feasts in a specific year.')
 args = parser.parse_args()
@@ -18,7 +19,7 @@ args = parser.parse_args()
 if(args.year is None):
 	currentDate = datetime.datetime.now()
 else:
-	if args.year < 0:
+	if args.year <= 0:
 		parser.error("Specified year must be greater than 0.")
 	currentDate = datetime.datetime(args.year, 1, 1)
 
@@ -144,6 +145,7 @@ def main():
 if __name__ == "__main__":
 	main()
 
+# TODO: Calculate Passover
 # TODO: Calculate Trinity Sunday
 # TODO: Determine Ordinary Time
 # TODO: Create a "print" function that handles the logic of formatting and adjusting date based on whether this year's feast has already passed.
