@@ -125,6 +125,16 @@ def getAshWednesday():
 		}
 	)
 
+def getPalmSunday():
+	easterDate = findFeast(feastDict, "Easter")
+	palmSundayDate = easterDate + timedelta(weeks=-1) # Palm Sunday is the Sunday before Easter
+
+	feastDict.update(
+		{
+			palmSundayDate: "Palm Sunday"
+		}
+	)
+
 # NOTE: This entire main() function is currently for development only
 # TODO: Replace this with something that only outputs info relevant to today by default
 def main():
@@ -134,17 +144,21 @@ def main():
 	getEasterDate()
 	easter = findFeast(feastDict, "Easter")
 
+	getAshWednesday()
+	ashWednesday = findFeast(feastDict, "Ash Wednesday")
+
+	getPalmSunday()
+	palmSunday = findFeast(feastDict, "Palm Sunday")
+
 	getAdventDates()
 	firstSundayofAdvent = findFeast(feastDict, "First Sunday of Advent")
 	secondSundayofAdvent = findFeast(feastDict, "Second Sunday of Advent")
 	thirdSundayofAdvent = findFeast(feastDict, "Third Sunday of Advent")
 	fourthSundayofAdvent = findFeast(feastDict, "Fourth Sunday of Advent")
 
-	getAshWednesday()
-	ashWednesday = findFeast(feastDict, "Ash Wednesday")
-
 	# Print out all the values for now:
 	print("Ash Wednesday: " + str(ashWednesday))
+	print("Palm Sunday: " + str(palmSunday))
 	print("Easter: " + str(easter))
 	print("First Sunday of Advent: " + str(firstSundayofAdvent))
 	print("Second Sunday of Advent: " + str(secondSundayofAdvent))
