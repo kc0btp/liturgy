@@ -3,14 +3,24 @@
 # 1. The current liturgical season.
 # 2. The current feast day, if it is a feast day.
 
+import argparse
 import datetime
 
 # Constants
 DAYS_IN_WEEK = 7
 feastDict = {}
 
-currentDate = datetime.datetime.now()
-# currentDate = datetime.datetime(2027, 1, 1)
+parser = argparse.ArgumentParser(description='Liturgy')
+parser.add_argument('-y', '--year', type=int, nargs='?', help='Display all the feasts in a specific year.')
+args = parser.parse_args()
+
+if(args.year is None):
+	currentDate = datetime.datetime.now()
+else:
+	if args.year < 0:
+		parser.error("Specified year must be greater than 0.")
+	currentDate = datetime.datetime(args.year, 1, 1)
+
 currentYear = int(currentDate.strftime("%Y"))
 
 # https://www.iccec.org/prayerandreadings/Seasons/index.php
@@ -104,7 +114,6 @@ def getEasterDate():
 		}
 	)
 
-
 # NOTE: This entire main() function is currently for development only
 # TODO: Replace this with something that only outputs info relevant to today by default
 def main():
@@ -121,13 +130,13 @@ def main():
 	fourthSundayofAdvent = findFeast(feastDict, "Fourth Sunday of Advent")
 
 	# Print out all the values for now:
-	print("Christmas: " + str(christmas))
-	print("Epiphany: " + str(epiphany))
-	print("Easter: " + str(easter))
+	# print("Easter: " + str(easter))
 	print("First Sunday of Advent: " + str(firstSundayofAdvent))
 	print("Second Sunday of Advent: " + str(secondSundayofAdvent))
 	print("Third Sunday of Advent: " + str(thirdSundayofAdvent))
 	print("Fourth Sunday of Advent: " + str(fourthSundayofAdvent))
+	print("Christmas: " + str(christmas))
+	print("Epiphany: " + str(epiphany))
 
 if __name__ == "__main__":
 	main()
@@ -138,4 +147,6 @@ if __name__ == "__main__":
 # TODO: Calculate Trinity Sunday
 # TODO: Determine Ordinary Time
 # TODO: Allow arguments to find select or all feast dates for a given year
-# REFACTOR: Figure out a way to determine current holiday based on today's date
+# TODO: Create a "print" function that handles the logic of formatting and adjusting date based on whether this year's feast has already passed.
+# REFACTOR: Figure out a way to determine current holiday season based on today's date
+# REFACTOR: findFeast should be able to get current year feast but also next occurrence of a feast even if it's in the next year. Maybe findFeast can remain a pure function to find the feasts within a given year, but then I make a separate function that I can use to determine whether the feast date has already occurred and adjust the year accordingly.
