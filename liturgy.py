@@ -39,6 +39,7 @@ currentYear = int(currentDate.strftime("%Y"))
 # Add fixed feast dates
 feastDict.update(
 	{
+		datetime.date(currentYear, 12, 13): "Saint Lucy's (Sankta Lucia)",
 		datetime.date(currentYear, 12, 24): "Christmas Eve",
 		datetime.date(currentYear, 12, 25): "Christmas Day",
 		datetime.date(currentYear, 1, 6): "The Epiphany"
@@ -145,7 +146,6 @@ def main():
 if __name__ == "__main__":
 	main()
 
-# TODO: Calculate Passover
 # TODO: Calculate Trinity Sunday
 # TODO: Determine Ordinary Time
 # TODO: Create a "print" function that handles the logic of formatting and adjusting date based on whether this year's feast has already passed.
