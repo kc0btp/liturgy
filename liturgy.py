@@ -1,153 +1,186 @@
-# liturgy.py
-# The goal is to make this script print two things:
-# 1. The current liturgical season.
-# 2. The current feast day, if it is a feast day.
+#!/usr/bin/env python3
+"""Simple liturgical season/holiday detector for the Western Christian calendar.
 
-import argparse
-import datetime
-from datetime import timedelta
+Usage:
+  uv run liturgy.py                   # uses today's date
+  uv run liturgy.py 2026-02-14        # use specific date
+  uv run liturgy.py --debug           # includes the date
+  uv run liturgy.py 2026-02-14 --debug
+"""
+from __future__ import annotations
+import sys
+from datetime import date, timedelta
 
-# Constants
-DAYS_IN_WEEK = 7
-feastDict = {}
 
-# TODO: Add a new argument to look up a specific feast; can be combined with --year
-parser = argparse.ArgumentParser(description='Liturgy')
-parser.add_argument('-y', '--year', type=int, nargs='?', help='Display all the feasts in a specific year.')
-args = parser.parse_args()
+PASCHAL_MOON_DATES = {
+    1: (4, 14),
+    2: (4, 3),
+    3: (3, 23),
+    4: (4, 11),
+    5: (3, 31),
+    6: (4, 18),
+    7: (4, 14),
+    8: (4, 8),
+    9: (4, 16),
+    10: (4, 5),
+    11: (3, 25),
+    12: (4, 13),
+    13: (4, 2),
+    14: (3, 22),
+    15: (4, 10),
+    16: (3, 30),
+    17: (4, 17),
+    18: (4, 7),
+    19: (3, 27),
+}
 
-if(args.year is None):
-	currentDate = datetime.datetime.now()
-else:
-	if args.year <= 0:
-		parser.error("Specified year must be greater than 0.")
-	currentDate = datetime.datetime(args.year, 1, 1)
 
-currentYear = int(currentDate.strftime("%Y"))
+def easter_date(year: int) -> date:
+    """Calculate Easter Sunday using the 1662 BCP Paschal Moon table."""
+    golden_number = (year % 19) + 1
+    month, day = PASCHAL_MOON_DATES[golden_number]
+    paschal_moon = date(year, month, day)
 
-# https://www.iccec.org/prayerandreadings/Seasons/index.php
-# Determine the season. The basic Rules:
-# If today is between the first day of Advent (inclusive) and Christmas, it's Advent.
-# If today is between Christmas (inclusive) and Epiphany (exclusive), it's Christmas.
-# If today is between Epiphany (inclusive) and Ash Wednesday (exclusive), it's Epiphany.
-# If today is between Ash Wednesday (inclusive) and Palm Sunday (exclusive), it's Lent.
-# If today is between Palm Sunday (inclusive) and Easter (exclusive), it's Holy Week.
-# If today is between Easter (inclusive) and Pentecost (exclusive), it's Easter.
-# If today is between Pentecost (inclusive) and Trinity Sunday (exclusive), it's Pentecost.
-# If today is between Trinity Sunday (inclusive) and the first day of Advent, it's Ordinary Time.
+    if paschal_moon.weekday() == 6:
+        return paschal_moon + timedelta(days=7)
 
-# Add fixed feast dates
-feastDict.update(
-	{
-		datetime.date(currentYear, 12, 13): "Saint Lucy's (Sankta Lucia)",
-		datetime.date(currentYear, 12, 24): "Christmas Eve",
-		datetime.date(currentYear, 12, 25): "Christmas Day",
-		datetime.date(currentYear, 1, 6): "The Epiphany"
-	}
-)
+    days_until_sunday = 7 - (paschal_moon.weekday() + 1)
+    return paschal_moon + timedelta(days=days_until_sunday)
 
-# Generic function to find a feast date (key) in a dictionary by name (value).
-def findFeast(dict, searchName):
-	for date, name in dict.items():
-		if name == searchName:
-			return date
 
-# Calculate the four Sundays of Advent based on the date of Christmas.
-def getAdventDates():
-	christmas = findFeast(feastDict, "Christmas Day")
-	idx = (christmas.weekday() + 1) % DAYS_IN_WEEK # Add 1 for 0-indexed week values
+def advent_start(year: int) -> date:
+    """Advent starts on the fourth Sunday before Christmas, i.e. the Sunday between Nov 27 and Dec 3 inclusive."""
+    # search Nov 27..Dec 3 for Sunday
+    for day in range(27, 31):
+        try_date = date(year, 11, day)
+        if try_date.weekday() == 6:  # Sunday
+            return try_date
+    # fallback: search Dec 1..Dec 3
+    for day in range(1, 4):
+        try_date = date(year, 12, day)
+        if try_date.weekday() == 6:
+            return try_date
+    return date(year, 11, 27)
 
-	firstSunday = christmas - datetime.timedelta(days = idx, weeks = 3)
-	secondSunday = christmas - datetime.timedelta(days = idx, weeks = 2)
-	thirdSunday = christmas - datetime.timedelta(days = idx, weeks = 1)
-	fourthSunday = christmas - datetime.timedelta(days = idx)
 
-	feastDict.update(
-		{
-			firstSunday: "First Sunday of Advent",
-			secondSunday: "Second Sunday of Advent",
-			thirdSunday: "Third Sunday of Advent",
-			fourthSunday: "Fourth Sunday of Advent"
-		}
-	)
+def advent_sunday_name(d: date, adv_start: date) -> str:
+    """Return the numbered name for an Advent Sunday."""
+    week = (d - adv_start).days // 7 + 1
+    ordinals = ("First", "Second", "Third", "Fourth")
+    if 1 <= week <= len(ordinals):
+        return f"{ordinals[week - 1]} Sunday of Advent"
+    return "Advent"
 
-# Calculate the date of Easter based on the Paschal Moon and golden numbers.
-def getEasterDate():
 
-	# A table of golden numbers to find Easter Day taken from the 1662 Book of Common Prayer.
-	easterDict = {
-		1: datetime.date(currentYear, 4, 14),
-		2: datetime.date(currentYear, 4, 3),
-		3: datetime.date(currentYear, 3, 23),
-		4: datetime.date(currentYear, 4, 11),
-		5: datetime.date(currentYear, 3, 31),
-		6: datetime.date(currentYear, 4, 18),
-		7: datetime.date(currentYear, 4, 14),
-		8: datetime.date(currentYear, 4, 8),
-		9: datetime.date(currentYear, 4, 16),
-		10: datetime.date(currentYear, 4, 5),
-		11: datetime.date(currentYear, 3, 25),
-		12: datetime.date(currentYear, 4, 13),
-		13: datetime.date(currentYear, 4, 2),
-		14: datetime.date(currentYear, 3, 22),
-		15: datetime.date(currentYear, 4, 10),
-		16: datetime.date(currentYear, 3, 30),
-		17: datetime.date(currentYear, 4, 17),
-		18: datetime.date(currentYear, 4, 7),
-		19: datetime.date(currentYear, 3, 27)
-	}
+def detect_liturgical_season(d: date) -> str:
+    y = d.year
+    today = d
 
-	# Calculate the year's golden number per the 1662 Book of Common Prayer.
-	goldenNumber = (currentYear + 1) % len(easterDict) # Add 1 for zero-indexed week values
+    # Easter and related movable feasts
+    easter = easter_date(y)
+    ash = easter - timedelta(days=46)
+    palm = easter - timedelta(days=7)
+    holy_thursday = easter - timedelta(days=3)
+    good_friday = easter - timedelta(days=2)
+    holy_saturday = easter - timedelta(days=1)
+    ascension = easter + timedelta(days=39)
+    pentecost = easter + timedelta(days=49)
 
-	# The date of the Paschal full moon for the year.
-	paschal = easterDict[goldenNumber]
+    # Advent (starts in late Nov/early Dec)
+    adv_start = advent_start(y)
+    adv_end = date(y, 12, 24)
 
-	# The Sunday following the Paschal moon.
-	# If the Paschal moon falls on a Sunday, Easter is the following Sunday.
-	if(paschal.weekday() + 1 == DAYS_IN_WEEK):
-		easterDate = paschal + datetime.timedelta(days = DAYS_IN_WEEK)
-	else:
-		timeDelta = DAYS_IN_WEEK - (paschal.weekday() + 1)
-		easterDate = paschal + datetime.timedelta(days = timeDelta)
+    # Christmas: Dec 25 -> Jan 5 (approx. until Epiphany)
+    christ_start = date(y, 12, 25)
+    christ_end = date(y + 1, 1, 5)
 
-	feastDict.update({easterDate: "Easter"})
-	return easterDate
+    # If date is in early January, treat Christmas season of previous year
+    if d.month == 1 and d.day <= 5:
+        christ_start = date(y - 1, 12, 25)
+        christ_end = date(y, 1, 5)
 
-# Ash Wednesday is always 46 days before Easter
-def getAshWednesday(easterDate):
-	ashWednesdayDate = easterDate + timedelta(days=-46)
-	feastDict.update({ashWednesdayDate: "Ash Wednesday"})
+    # Ordinary Time ranges (approximated)
+    ordinary_winter_start = date(y, 1, 6)
+    ordinary_winter_end = ash - timedelta(days=1)
 
-# Palm Sunday is the Sunday before Easter
-def getPalmSunday(easterDate):
-	palmSundayDate = easterDate + timedelta(weeks=-1)
-	feastDict.update({palmSundayDate: "Palm Sunday"})
+    ordinary_summer_start = pentecost + timedelta(days=1)
+    ordinary_summer_end = adv_start - timedelta(days=1)
 
-def getPentecost(easterDate):
-	pentecostDate = easterDate + timedelta(days=50)
-	feastDict.update({pentecostDate: "Pentecost"})
+    # Special fixed feasts
+    if d == ash:
+        return "Ash Wednesday"
+    if d == palm:
+        return "Palm Sunday (Holy Week)"
+    if d == holy_thursday:
+        return "Maundy Thursday (Holy Thursday)"
+    if d == good_friday:
+        return "Good Friday"
+    if d == holy_saturday:
+        return "Holy Saturday"
+    if d == easter:
+        return "Easter Sunday"
+    if d == ascension:
+        return "Ascension (observed)"
+    if d == pentecost:
+        return "Pentecost"
 
-# NOTE: This entire main() function is currently for development only
-# TODO: Replace this with something that only outputs info relevant to today by default
-def main():
+    # Seasons
+    if adv_start <= d <= adv_end:
+        if d.weekday() == 6:
+            return advent_sunday_name(d, adv_start)
+        return "Advent"
 
-	easterDate = getEasterDate()
+    # Christmas season (covers Jan 1..Jan 5 or Dec 25..Dec31)
+    if christ_start <= d <= christ_end:
+        return "Christmas Season"
 
-	getAshWednesday(easterDate)
-	getPalmSunday(easterDate)
-	getPentecost(easterDate)
-	getAdventDates()
+    # Epiphany (Jan 6)
+    if d.month == 1 and d.day == 6:
+        return "Epiphany"
 
-	# Print out all the values for now:
-	for(date, name) in sorted(feastDict.items()):
-		print(f"{name}: {date}")
+    # Lent (from Ash Wednesday until start of Holy Week)
+    if ash <= d < palm:
+        return "Lent"
+
+    # Holy Week (Palm Sunday through Holy Saturday)
+    if palm <= d < easter:
+        return "Holy Week"
+
+    # Easter Season (Easter Sunday through Pentecost)
+    if easter <= d <= pentecost:
+        return "Easter Season"
+
+    # Ordinary Time (before Lent)
+    if ordinary_winter_start <= d <= ordinary_winter_end:
+        return "Ordinary Time"
+
+    # Ordinary Time (after Pentecost until Advent)
+    if ordinary_summer_start <= d <= ordinary_summer_end:
+        return "Ordinary Time"
+
+    # If none matched, default to Ordinary Time
+    return "Ordinary Time"
+
+
+def main(argv: list[str]):
+    debug = "--debug" in argv
+    arguments = [argument for argument in argv[1:] if argument != "--debug"]
+
+    if arguments:
+        try:
+            parts = arguments[0].split("-")
+            y, m, day = map(int, parts)
+            d = date(y, m, day)
+        except Exception:
+            print("Invalid date. Use YYYY-MM-DD")
+            return 2
+    else:
+        d = date.today()
+
+    season = detect_liturgical_season(d)
+    print(f"{d.isoformat()}: {season}" if debug else season)
+    return 0
+
 
 if __name__ == "__main__":
-	main()
-
-# TODO: Calculate Trinity Sunday
-# TODO: Determine Ordinary Time
-# TODO: Create a "print" function that handles the logic of formatting and adjusting date based on whether this year's feast has already passed.
-# REFACTOR: Figure out a way to determine current holiday season based on today's date
-# REFACTOR: findFeast should be able to get current year feast but also next occurrence of a feast even if it's in the next year. Maybe findFeast can remain a pure function to find the feasts within a given year, but then I make a separate function that I can use to determine whether the feast date has already occurred and adjust the year accordingly.
+    raise SystemExit(main(sys.argv))

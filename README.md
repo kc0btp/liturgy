@@ -1,12 +1,44 @@
 # About
 
-Liturgy is a simple python script that will calculate all of the holy days of the liturgical calendar. The goal of this project is to display the current liturgical period or holiday for the current date in [dmenu](https://tools.suckless.org/dmenu/), but it can be used as a stand-alone script as well. The primary source for my calculation has been the 1662 Anglican Book of Common Prayer, though I am not Anglican and the audience for this is not any specific denomination.
+Liturgy is a simple python script that will calculate the holy days of the liturgical calendar. The goal of this project is to display the current liturgical period or holiday for the current date in the macOS menu bar with [SwiftBar](https://github.com/swiftbar/SwiftBar), but it can be used as a stand-alone script as well. The primary source for my calculation has been the 1662 Anglican Book of Common Prayer, though I am not Anglican and the audience for this is not any specific denomination.
+
+Full disclosure: I am a mere hobbyist. I started writing this myself and lost interest after a while, but now that all the cool kids are using AI, I decided to try my hand at some basic vibe coding. This is the result.
+
+# Output examples
+
+- `2026-04-05: Palm Sunday (Holy Week)`
+- `2026-04-12: Easter Sunday`
+- `2026-12-06: Second Sunday of Advent`
+- `2026-12-07: Advent`
+
+# Setup
+
+This project uses [uv](https://docs.astral.sh/uv/) to manage Python and dependencies.
+
+```bash
+uv sync
+```
 
 # Use
 
-Basic use is as easy as `python liturgy.py`, which will output all of the holidays for the current year. Liturgy will also accept the `--year` or `-y` option followed by a year to list the holidays of the specified year, e.g.:
+Run for today:
 
-`python liturgy.py -y 2050`
+```bash
+uv run liturgy.py
+```
+
+Run for a specific date (YYYY-MM-DD):
+
+```bash
+uv run liturgy.py 2026-04-05
+```
+
+Debug output includes the date:
+
+```bash
+uv run liturgy.py --debug
+uv run liturgy.py 2026-04-05 --debug
+```
 
 # Planned Improvements
 

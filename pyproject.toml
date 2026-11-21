@@ -1,0 +1,6 @@
+[project]
+name = "liturgy-ai"
+version = "0.1.0"
+description = "A liturgical season and holiday detector"
+requires-python = ">=3.10"
+dependencies = []
