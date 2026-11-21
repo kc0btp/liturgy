@@ -42,4 +42,4 @@ uv run liturgy.py 2026-04-05 --debug
 
 # Planned Improvements
 
-I intend to add another option to only return the date for a specified holiday, and will add a mode to only show the next, upcoming holiday relative to the current date. Eventually, I'll also have it determine the current liturgical season (e.g. Advent, Ordinary Time, etc.) based on the current date. If the current date is a holiday, the holiday name will be returned instead of the season.
+I intend to add another option to only return the date for a specified holiday, and will add a mode to only show the next, upcoming holiday relative to the current date.

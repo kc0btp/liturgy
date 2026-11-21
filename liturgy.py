@@ -202,3 +202,5 @@ def main(argv: list[str]):
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))
+
+# TODO: Calculate Trinity Sunday
